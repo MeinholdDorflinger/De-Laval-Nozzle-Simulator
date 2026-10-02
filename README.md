@@ -8,7 +8,7 @@ Numerical solver to model 1D compressible flow through a custom parabolic conver
                                  y_top = 1/25 * x.^2 + 1
                               y_bottom = -1/25 * x.^2 - 1
  - The throat is located at x = 0, with the throat radius being obtained from the upper parabolic y-value
- - Asymmetry/Symmetry can be chosen by altering the domain of x-values so that the magnitude of the ends of the domain aren't equal to each other
+ - Asymmetry/Symmetry can be chosen by altering the domain of x-values so that the magnitude of the ends of the domain aren't equal to each other, since the throat of the nozzle is centered about x = 0
   
     Asymmetric:  
 
@@ -18,7 +18,7 @@ Numerical solver to model 1D compressible flow through a custom parabolic conver
 
        x=-2:0.2:2 ---- Equal magnitude of end values (-2/2)
 
-**Area Dsitribution**
+**Area Distribution**
 
  - The cross-sectional area across the nozzle can be calculated with:
 
@@ -29,7 +29,7 @@ Numerical solver to model 1D compressible flow through a custom parabolic conver
 
 **Mach Number**
 
- - Mach number must be obtained by using the area-Mach relation, which is found by using MATLAB's fzero function
+ - Mach number is obtained by using the area-Mach relation, which is found using MATLAB's fzero function
  - Subsonic values are found at any point from the inlet to just before the throat
  - Supersonic values are achieved after passing through the nozzle throat, meaning at x = 0 is when Mach equals 1
 
@@ -39,11 +39,11 @@ Numerical solver to model 1D compressible flow through a custom parabolic conver
 
        Gamma = 1.4
    
-       R = 287.0 kJ/(Kg*K)
+       R = 287.0 J/(Kg*K)
      
-       Inlet Temperature = 3000 K
+       Stagnation Temperature = 3000 K
 
-       Inlet Pressure = 1 MPa
+       Stagnation Pressure = 1 MPa
 
        Ambient Pressure = 101.325 kPa
 
@@ -58,6 +58,12 @@ Numerical solver to model 1D compressible flow through a custom parabolic conver
        Density = Pressure./(R.*Temperature)                                         ---- kg/m^3
 
        Mass Flow Rate = Density.*Area.*Velocity                                     ---- kg/s
+
+**Continuity Verification**
+
+ - Using the distribution of Mass Flow Rate that we evaluated, we can conduct a validation check. Conservation of Mass requires that the Mass Flow Rate remain steady throughout the nozzle.
+
+ - This is confirmed by having a **ṁ** distribution with no slope
 
 **Performance Outputs**
 
