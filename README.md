@@ -1,45 +1,99 @@
 # Quasi-1D-De-Laval-Nozzle-Simulator
-Numerical solver to model 1D compressible flow through a custom parabolic converging-diverging nozzle. Utilizes the Area-Mach relation to compute and distribute subsonic-to-supersonic flow transitions through the nozzle throat. Generates distributions for temperature, pressure, velocity, and mass flow rate. Evaluates thrust, exit Mach, and ideal area/pressure ratios, which are desirable for engine performance.
+Numerical solver to model 1D compressible flow through a custom parabolic converging-diverging nozzle. Utilizes the area-Mach relation to compute Mach number distributions as well as calculate temperature, pressure, velocity, mass flow rate, and total thrust.
 
-• Defines two opposing (positive and negative) parabolic functions that map out the converging-diverging De Laval Nozzle. The nozzle throat radius can be altered in the equation by changing h ( y=cx^2 + h ). The nozzle can be altered to be either symmetrical or asymmetrical by changing the domain of x-values used ( centered on the origin ).
+**Nozzle Geometry**
 
-• Areas along the nozzle are found by using the y-values as the radius and solving for area = pi*r^2
+ - The nozzle is defined by two opposing parabolic functions:
 
-• Necessary constants are then defined by no specific measure: Gamma, R, inlet temperature/pressure, and ambient pressure.
+                                 y_top = 1/25 * x.^2 + 1
+                              y_bottom = -1/25 * x.^2 - 1
+ - The throat is located at x = 0, with the throat radius being obtained from the upper parabolic y-value
+ - Asymmetry/Symmetry can be chosen by altering the domain of x-values so that the magnitude of the ends of the domain aren't equal to each other
+  
+    Asymmetric:  
 
-• In order to find Mach distributions, the Mach-Area relation is utilized and solved for with MATLAB's fzero function.
+        x=-2:0.2:3 ---- Differing magnitude of end values (-2/3)
 
-• Rearranging the Mach-Area relation allows us to find temperature and pressure distributions.
+   Symmetric:
 
-• Velocity is then found by multiplying M*a, where "a" is the local speed of sound.
+       x=-2:0.2:2 ---- Equal magnitude of end values (-2/2)
 
-• To ensure validity, we can perform a Continuity Verification, where we find the mass flow rate throughout the nozzle. In conjunction with the Law of Conservation of Mass, the mass flow rate must be constant throughout, displaying a graph with y equal to a constant.
+**Area Dsitribution**
 
-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ - The cross-sectional area across the nozzle can be calculated with:
 
-Example
+                           Area = pi.*radius.^2
+ - The ratio of cross-sectional area at any point on the nozzle with the area of the throat can be found with:
 
-- The first step is to define the x-axis limits. A domain ending in different values gives us an asymmetrical nozzle, such as [-2, 3] 
-- Defining our opposing parabolic functions is the second step. In this example, we use y_top = (1/23.5)*x^2+1 and y_bottom = -(1/23.5)*x^2+1
-- Our constants Gamma, R, initial temp., initial pressure, and ambient pressure are defined as 1.4, 287 J/(kg*k), 3000 K, 1000000 Pa, and 101325 Pa, respectively.
-- The script then solves for and plots the following outputs provided at the bottom:
+                           Area./Area_throat
 
-  (Note: the subsonic-to-supersonic transition occurs at x=0, the same point as the nozzle throat.)
-- The script then numerically outputs the following:
+**Mach Number**
 
-  Inlet Pressure (Pascals): 1000000 
+ - Mach number must be obtained by using the area-Mach relation, which is found by using MATLAB's fzero function
+ - Subsonic values are found at any point from the inlet to just before the throat
+ - Supersonic values are achieved after passing through the nozzle throat, meaning at x = 0 is when Mach equals 1
 
-  Ambient Pressure (Pascals): 101325 
+**Thermodynamic Properties**
 
-  Inlet Temperature (K): 3000 
+ - Initial values must be provided, such as:
 
-  Gamma: 1.40 
+       Gamma = 1.4
+   
+       R = 287.0 kJ/(Kg*K)
+     
+       Inlet Temperature = 3000 K
 
-  Outlet vs Throat Area Ratio = 1.91   
+       Inlet Pressure = 1 MPa
 
-  Outlet vs Ambient Pressure = 1.00
+       Ambient Pressure = 101.325 kPa
 
-  Force (N): 3943530.52 
+ - Utilizing the above, we can determine the distribution of these Thermodynamic Properties:
 
-  Exit Mach: 2.15 
-<img width="1355" height="869" alt="De_Laval_Nozzle_Subplots" src="https://github.com/user-attachments/assets/20e03d0e-e671-40ff-a869-8158c57fea74" />
+       Pressure = Inlet_Pressure * (1 + ((gamma-1)/2).*Mach.^2).^(-gamma/(gamma-1)) ---- Pascals
+
+       Temperature = Inlet_Temperature * (1 + ((gamma-1)/2).*Mach.^2).^(-1)         ---- Kelvin
+
+       Velocity = Mach. * sqrt(gamma.*R.*T)                                         ---- Meters per second
+
+       Density = Pressure./(R.*Temperature)                                         ---- kg/m^3
+
+       Mass Flow Rate = Density.*Area.*Velocity                                     ---- kg/s
+
+**Performance Outputs**
+
+ - Running the script outputs both numerical values and distributions:
+
+   Example:
+
+       Exit Mach 2.15 
+
+       Exit Pressure 101.33 kPa 
+
+       Ambient Pressure 101.33 kPa 
+  
+       Expansion Condition: Ideally Expanded 
+
+       Momentum Thrust 3943.52 kN 
+
+       Pressure Thrust 0.01 kN 
+
+       Total Thrust 3943.53 kN 
+
+
+<img width="1347" height="873" alt="Figure_1" src="https://github.com/user-attachments/assets/2f7c097e-50e7-4f46-9494-562814b2641e" />
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+**Assumptions**
+
+ - This is a Quasi-1D De Laval Nozzle Simulator. The main assumption is that all flow properties vary only along the x-axis (1D), and all changes are completely uniform for the entire cross-section
+ - It also assumes:
+
+    No Heat Transfer
+
+    No Friction
+   
+    Ideal Gas
+   
+    Steady Flow
